@@ -1,0 +1,20 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "composite": true,
+    "module": "ESNext",
+    "moduleResolution": "node"
+  },
+  "include": ["src/**/*"],
+  "references": [
+    { "path": "../core" },
+    { "path": "../platform" },
+    { "path": "../repository" },
+    { "path": "../pattern-detection" },
+    { "path": "../refactoring" }
+  ]
+}
+
+// Made with Bob

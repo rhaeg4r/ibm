@@ -1,0 +1,44 @@
+{
+  "name": "@cross-repo-refactor/pattern-detection",
+  "version": "0.1.0",
+  "description": "AI-powered pattern detection for Cross-Repo Refactor Coordinator",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc --watch",
+    "clean": "rimraf dist"
+  },
+  "keywords": [
+    "pattern-detection",
+    "code-analysis",
+    "ast",
+    "embeddings",
+    "ai"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@cross-repo-refactor/core": "^0.1.0",
+    "@cross-repo-refactor/repository": "^0.1.0",
+    "@babel/parser": "^7.24.0",
+    "@babel/traverse": "^7.24.0",
+    "@babel/types": "^7.24.0",
+    "tree-sitter": "^0.21.0",
+    "tree-sitter-typescript": "^0.21.0",
+    "tree-sitter-python": "^0.21.0",
+    "tree-sitter-javascript": "^0.21.0",
+    "tree-sitter-java": "^0.21.0",
+    "tree-sitter-go": "^0.21.0",
+    "tree-sitter-rust": "^0.21.0",
+    "openai": "^4.28.0",
+    "cohere-ai": "^7.7.0",
+    "glob": "^10.3.10",
+    "ignore": "^5.3.1"
+  },
+  "devDependencies": {
+    "@types/babel__traverse": "^7.20.5",
+    "@types/node": "^20.11.0",
+    "typescript": "^5.3.3"
+  }
+}

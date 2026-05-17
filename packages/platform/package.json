@@ -1,0 +1,34 @@
+{
+  "name": "@cross-repo-refactor/platform",
+  "version": "0.1.0",
+  "description": "Git platform abstraction layer supporting GitHub, GitLab, and Bitbucket",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "clean": "rm -rf dist",
+    "test": "jest",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [
+    "git",
+    "github",
+    "gitlab",
+    "bitbucket",
+    "platform"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@octokit/rest": "^20.0.2",
+    "@gitbeaker/rest": "^39.21.0",
+    "axios": "^1.6.5"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "typescript": "^5.3.3"
+  },
+  "peerDependencies": {
+    "@cross-repo-refactor/core": "^0.1.0"
+  }
+}

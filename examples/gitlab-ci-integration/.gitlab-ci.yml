@@ -1,0 +1,165 @@
+# GitLab CI/CD Integration Example for Cross-Repo Refactor Coordinator
+# This example shows how to use CI/CD tokens for automated refactoring workflows
+
+variables:
+  # Use GitLab CI/CD job token for authentication
+  GITLAB_TOKEN: $CI_JOB_TOKEN
+  NODE_VERSION: "18"
+
+stages:
+  - scan
+  - detect
+  - refactor
+  - propose
+
+# Cache node_modules for faster builds
+cache:
+  key: ${CI_COMMIT_REF_SLUG}
+  paths:
+    - node_modules/
+    - .refactor-cache/
+
+# Install dependencies
+before_script:
+  - npm install -g @cross-repo-refactor/cli
+  - echo "Using CI/CD token for GitLab authentication"
+
+# Scan repository for patterns
+scan_patterns:
+  stage: scan
+  image: node:${NODE_VERSION}
+  script:
+    - |
+      cat > .refactorrc.json <<EOF
+      {
+        "platform": {
+          "type": "gitlab",
+          "url": "${CI_SERVER_URL}",
+          "token": "${CI_JOB_TOKEN}",
+          "tokenType": "ci-cd"
+        },
+        "organization": "${CI_PROJECT_NAMESPACE}",
+        "repositories": {
+          "include": ["*"],
+          "exclude": ["archived-*"],
+          "filters": {
+            "languages": ["typescript", "javascript", "python"]
+          }
+        },
+        "ai": {
+          "embeddingModel": "codebert-base",
+          "similarityThreshold": 0.85,
+          "provider": "local"
+        },
+        "refactoring": {
+          "dryRun": true,
+          "autoApply": false,
+          "branchPrefix": "refactor/ci-",
+          "prTemplate": "templates/pr-template.md"
+        },
+        "cache": {
+          "directory": ".refactor-cache",
+          "maxSize": "5GB",
+          "ttl": 3600
+        }
+      }
+      EOF
+    - refactor scan . --output scan-results.json
+  artifacts:
+    paths:
+      - scan-results.json
+    expire_in: 1 day
+  only:
+    - main
+    - develop
+
+# Detect similar patterns across organization
+detect_patterns:
+  stage: detect
+  image: node:${NODE_VERSION}
+  dependencies:
+    - scan_patterns
+  script:
+    - refactor detect --input scan-results.json --output matches.json
+  artifacts:
+    paths:
+      - matches.json
+    expire_in: 1 day
+  only:
+    - main
+    - develop
+
+# Apply refactoring (dry-run by default)
+apply_refactoring:
+  stage: refactor
+  image: node:${NODE_VERSION}
+  dependencies:
+    - detect_patterns
+  script:
+    - refactor apply --input matches.json --dry-run --output results.json
+  artifacts:
+    paths:
+      - results.json
+    reports:
+      dotenv: refactor.env
+    expire_in: 1 day
+  only:
+    - main
+    - develop
+
+# Create coordinated merge requests (manual trigger)
+propose_changes:
+  stage: propose
+  image: node:${NODE_VERSION}
+  dependencies:
+    - apply_refactoring
+  script:
+    - |
+      # Only create MRs if not in dry-run mode
+      if [ "$DRY_RUN" != "true" ]; then
+        refactor propose --input results.json --output prs.json
+        echo "Created merge requests:"
+        cat prs.json | jq -r '.[] | "- \(.repository.fullName)!\(.number): \(.url)"'
+      else
+        echo "Dry-run mode: No merge requests created"
+        echo "Review results.json and set DRY_RUN=false to create MRs"
+      fi
+  artifacts:
+    paths:
+      - prs.json
+    expire_in: 7 days
+  when: manual
+  only:
+    - main
+    - develop
+
+# Scheduled job to scan for refactoring opportunities
+scheduled_scan:
+  stage: scan
+  image: node:${NODE_VERSION}
+  script:
+    - refactor scan . --output scheduled-scan.json
+    - |
+      # Send notification if patterns found
+      PATTERN_COUNT=$(cat scheduled-scan.json | jq '. | length')
+      if [ "$PATTERN_COUNT" -gt 0 ]; then
+        echo "Found $PATTERN_COUNT refactoring opportunities"
+        # Add webhook notification here
+      fi
+  artifacts:
+    paths:
+      - scheduled-scan.json
+    expire_in: 7 days
+  only:
+    - schedules
+
+# Cleanup old cache
+cleanup_cache:
+  stage: scan
+  image: node:${NODE_VERSION}
+  script:
+    - refactor cache clean --max-age 7d
+  only:
+    - schedules
+
+# Made with Bob

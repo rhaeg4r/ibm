@@ -1,0 +1,132 @@
+{
+  "name": "cross-repo-refactor",
+  "displayName": "Cross-Repo Refactor Coordinator",
+  "description": "AI-powered tool for coordinating refactoring patterns across multiple repositories",
+  "version": "0.1.0",
+  "publisher": "cross-repo-refactor",
+  "icon": "media/icon.png",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Other",
+    "Programming Languages",
+    "Linters"
+  ],
+  "keywords": [
+    "refactoring",
+    "multi-repo",
+    "gitlab",
+    "github",
+    "ai"
+  ],
+  "activationEvents": [
+    "onCommand:cross-repo-refactor.scanRepository",
+    "onCommand:cross-repo-refactor.detectPatterns",
+    "onCommand:cross-repo-refactor.applyRefactoring",
+    "onCommand:cross-repo-refactor.createPRs",
+    "onView:refactorExplorer"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "cross-repo-refactor.scanRepository",
+        "title": "Scan Repository for Patterns",
+        "category": "Cross-Repo Refactor"
+      },
+      {
+        "command": "cross-repo-refactor.detectPatterns",
+        "title": "Detect Similar Patterns Across Repos",
+        "category": "Cross-Repo Refactor"
+      },
+      {
+        "command": "cross-repo-refactor.applyRefactoring",
+        "title": "Apply Refactoring",
+        "category": "Cross-Repo Refactor"
+      },
+      {
+        "command": "cross-repo-refactor.createPRs",
+        "title": "Create Coordinated Pull Requests",
+        "category": "Cross-Repo Refactor"
+      },
+      {
+        "command": "cross-repo-refactor.configure",
+        "title": "Configure Settings",
+        "category": "Cross-Repo Refactor"
+      }
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "cross-repo-refactor",
+          "title": "Cross-Repo Refactor",
+          "icon": "media/icon.svg"
+        }
+      ]
+    },
+    "views": {
+      "cross-repo-refactor": [
+        {
+          "id": "refactorExplorer",
+          "name": "Patterns & Matches"
+        },
+        {
+          "id": "refactorResults",
+          "name": "Refactoring Results"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "Cross-Repo Refactor",
+      "properties": {
+        "crossRepoRefactor.platform.type": {
+          "type": "string",
+          "enum": ["github", "gitlab", "bitbucket"],
+          "default": "gitlab",
+          "description": "Git platform type"
+        },
+        "crossRepoRefactor.platform.url": {
+          "type": "string",
+          "default": "https://gitlab.com",
+          "description": "Platform API URL"
+        },
+        "crossRepoRefactor.organization": {
+          "type": "string",
+          "description": "Organization or group name"
+        },
+        "crossRepoRefactor.ai.similarityThreshold": {
+          "type": "number",
+          "default": 0.85,
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Similarity threshold for pattern matching (0-1)"
+        },
+        "crossRepoRefactor.refactoring.dryRun": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable dry-run mode by default"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "build": "tsc -p ./",
+    "clean": "rm -rf dist",
+    "package": "vsce package",
+    "publish": "vsce publish"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "@types/vscode": "^1.85.0",
+    "@vscode/vsce": "^2.22.0",
+    "typescript": "^5.3.3"
+  },
+  "dependencies": {
+    "@cross-repo-refactor/core": "^0.1.0",
+    "@cross-repo-refactor/platform": "^0.1.0"
+  }
+}

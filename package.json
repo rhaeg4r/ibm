@@ -1,0 +1,52 @@
+{
+  "name": "cross-repo-refactor",
+  "version": "0.1.0",
+  "private": true,
+  "description": "AI-powered tool for coordinating refactoring patterns across multiple repositories",
+  "keywords": [
+    "refactoring",
+    "cross-repo",
+    "ai",
+    "code-analysis",
+    "gitlab",
+    "github",
+    "automation"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-org/cross-repo-refactor.git"
+  },
+  "license": "MIT",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "npm run build --workspaces --if-present",
+    "build:core": "npm run build --workspace=packages/core",
+    "build:platform": "npm run build --workspace=packages/platform",
+    "test": "npm run test --workspaces --if-present",
+    "lint": "eslint packages/*/src/**/*.ts",
+    "format": "prettier --write \"packages/*/src/**/*.ts\"",
+    "clean": "npm run clean --workspaces --if-present && rm -rf node_modules",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "setup": "npm install && npm run build",
+    "dev": "npm run build -- --watch"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "@typescript-eslint/eslint-plugin": "^6.15.0",
+    "@typescript-eslint/parser": "^6.15.0",
+    "eslint": "^8.56.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.1.0",
+    "jest": "^29.7.0",
+    "lerna": "^8.0.2",
+    "prettier": "^3.1.1",
+    "ts-jest": "^29.1.1",
+    "typescript": "^5.3.3"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  }
+}

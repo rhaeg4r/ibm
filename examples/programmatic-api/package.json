@@ -1,0 +1,21 @@
+{
+  "name": "programmatic-api-example",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Simple programmatic API example for Cross-Repo Refactor Coordinator",
+  "scripts": {
+    "start": "ts-node simple-refactor.ts"
+  },
+  "dependencies": {
+    "@cross-repo-refactor/core": "workspace:*",
+    "@cross-repo-refactor/platform": "workspace:*",
+    "@cross-repo-refactor/repository": "workspace:*",
+    "@cross-repo-refactor/pattern-detection": "workspace:*",
+    "@cross-repo-refactor/refactoring": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.0.0"
+  }
+}

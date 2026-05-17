@@ -1,0 +1,25 @@
+{
+  "name": "@cross-repo-refactor/core",
+  "version": "0.1.0",
+  "description": "Core types and orchestration logic for cross-repo refactoring",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "clean": "rm -rf dist",
+    "test": "jest",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [
+    "refactoring",
+    "types",
+    "core"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {},
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "typescript": "^5.3.3"
+  }
+}

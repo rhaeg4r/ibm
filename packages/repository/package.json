@@ -1,0 +1,32 @@
+{
+  "name": "@cross-repo-refactor/repository",
+  "version": "0.1.0",
+  "description": "Repository management for Cross-Repo Refactor Coordinator",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc --watch",
+    "clean": "rimraf dist"
+  },
+  "keywords": [
+    "git",
+    "repository",
+    "clone",
+    "cache"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@cross-repo-refactor/core": "^0.1.0",
+    "simple-git": "^3.25.0",
+    "fs-extra": "^11.2.0",
+    "p-queue": "^8.0.1",
+    "p-limit": "^5.0.0"
+  },
+  "devDependencies": {
+    "@types/fs-extra": "^11.0.4",
+    "@types/node": "^20.11.0",
+    "typescript": "^5.3.3"
+  }
+}

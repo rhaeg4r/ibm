@@ -1,0 +1,77 @@
+{
+  "$schema": "./config-schema.json",
+  "platform": {
+    "type": "gitlab",
+    "url": "https://gitlab.com",
+    "token": "${GITLAB_TOKEN}",
+    "tokenType": "personal",
+    "rateLimit": {
+      "maxRequests": 600,
+      "windowMs": 60000
+    },
+    "timeout": 30000,
+    "retries": 3
+  },
+  "organization": "my-organization",
+  "repositories": {
+    "include": ["*"],
+    "exclude": ["archived-*", "deprecated-*", "test-*"],
+    "filters": {
+      "languages": ["typescript", "javascript", "python", "go"],
+      "minActivity": "2024-01-01",
+      "archived": false
+    }
+  },
+  "ai": {
+    "embeddingModel": "codebert-base",
+    "similarityThreshold": 0.85,
+    "provider": "local",
+    "maxTokens": 2048,
+    "temperature": 0.1
+  },
+  "refactoring": {
+    "dryRun": true,
+    "autoApply": false,
+    "branchPrefix": "refactor/cross-repo-",
+    "prTemplate": "templates/pr-template.md",
+    "commitMessageTemplate": "refactor: {{description}}",
+    "maxConcurrency": 5,
+    "validation": {
+      "enabled": true,
+      "rules": [
+        {
+          "type": "syntax",
+          "required": true
+        },
+        {
+          "type": "build",
+          "command": "npm run build",
+          "timeout": 300000,
+          "required": false
+        }
+      ]
+    }
+  },
+  "cache": {
+    "directory": ".refactor-cache",
+    "maxSize": "10GB",
+    "ttl": 86400,
+    "cleanupInterval": 3600,
+    "compression": true
+  },
+  "logging": {
+    "level": "info",
+    "file": "refactor.log",
+    "console": true,
+    "format": "text"
+  },
+  "webhooks": [
+    {
+      "url": "https://hooks.slack.com/services/YOUR/WEBHOOK/URL",
+      "events": ["pr:created", "pr:merged", "operation:completed", "error"],
+      "headers": {
+        "Content-Type": "application/json"
+      }
+    }
+  ]
+}
