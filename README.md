@@ -1,6 +1,6 @@
 # Cross-Repo Refactor Coordinator
 
-AI-powered tool for coordinating refactoring patterns across multiple repositories in an organization
+AI-powered tool for coordinating refactoring patterns across multiple repositories in an organization.
 
 ## The Problem
 
