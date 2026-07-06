@@ -1,34 +1,32 @@
 # Cross-Repo Refactor Coordinator
 
-> AI-powered tool for coordinating refactoring patterns across multiple repositories in an organization
+> You changed one function in one repo. Somewhere, in eleven other repos, the same function is quietly rotting. This tool knows where.
 
-## Overview
+## The Problem
 
-The Cross-Repo Refactor Coordinator solves a critical problem that traditional AI assistants cannot: **coordinating code refactoring across multiple repositories with full context awareness**. When you refactor a pattern in one repository, this tool automatically detects similar patterns across all your organization's repositories and proposes coordinated pull requests.
+Every org has this ghost: a pattern copied across a dozen repos, in three languages, by four people who have since left. You fix it in one place, feel briefly virtuous, and forget the other eleven. Six weeks later a bug report arrives from a service you forgot existed.
 
-## Key Features
+The Cross-Repo Refactor Coordinator finds those eleven other places, applies the same fix, and opens linked pull requests so your reviewers can see the whole blast radius in one glance. It does not care that the Python version uses `requests` and the Go version uses `net/http`. It matches on what the code *means*, not how it's spelled.
 
-- 🔍 **AI-Powered Pattern Detection**: Uses semantic code embeddings to find similar patterns across different languages and codebases
-- 🌐 **Multi-Platform Support**: Works with GitHub, GitLab, and Bitbucket
-- 🔄 **Coordinated PRs**: Creates linked pull requests across all affected repositories
-- 💻 **Dual Interface**: Available as both CLI tool and VS Code extension
-- 🎯 **Language Agnostic**: Supports polyglot repositories with multiple programming languages
-- 🛡️ **Safe by Default**: Dry-run mode, automatic backups, and rollback capabilities
-- ⚡ **Efficient**: Parallel processing, intelligent caching, and incremental updates
+## What It Does
 
-## Use Cases
+- **Finds patterns by meaning, not by grep.** Semantic code embeddings match `fetchUserData` in TypeScript to `get_user_data` in Python to `FetchUserData` in Go, even when the surface syntax shares nothing.
+- **Speaks GitHub, GitLab, and Bitbucket.** One config, one workflow, three platforms.
+- **Opens coordinated PRs.** Linked, cross-referenced, labeled, and pointed at the right reviewers, so nobody has to play detective.
+- **Runs from your terminal or your editor.** CLI for the automators, VS Code extension for the point-and-clickers.
+- **Doesn't panic about polyglot repos.** Multiple languages in one codebase is the normal case, not the edge case.
+- **Assumes it might be wrong.** Dry-run is the default. Backups happen automatically. Rollback is one command. You have to *ask* it to touch anything for real.
+- **Doesn't waste your afternoon.** Parallel processing, cached embeddings, incremental scans.
 
-### 1. API Migration
-Refactor an API endpoint in one service, and automatically update all microservices that consume it.
+## When You'd Reach For This
 
-### 2. Security Patches
-Apply a security fix pattern in one repository and propagate it across all repositories with similar vulnerable code.
+**API migration.** You bump an endpoint in one service. Every microservice that calls it gets the update, coordinated, before the old route 404s in production.
 
-### 3. Dependency Updates
-Update a deprecated library usage pattern and coordinate the change across your entire organization.
+**Security patches.** You write the fix once. The tool hunts down every repo with the same vulnerable shape and propagates it, instead of you filing eleven tickets and hoping.
 
-### 4. Code Standardization
-Enforce coding standards by refactoring patterns in one repository and applying them organization-wide.
+**Killing a deprecated dependency.** That library everyone was told to stop using two years ago? Find every last usage and retire it in one sweep.
+
+**Standardization that actually sticks.** Refactor a pattern into the shape you want, then stamp it across the org. Coding standards enforced by machines instead of by nagging in code review.
 
 ## Architecture
 
@@ -56,6 +54,8 @@ Enforce coding standards by refactoring patterns in one repository and applying 
 └─────────────────────────────────────────────────────────────┘
 ```
 
+Three layers, one job: turn "I fixed it here" into "it's fixed everywhere."
+
 ## Quick Start
 
 ### Installation
@@ -70,7 +70,7 @@ code --install-extension cross-repo-refactor
 
 ### Configuration
 
-Create a `.refactorrc.json` file in your project root:
+Drop a `.refactorrc.json` in your project root:
 
 ```json
 {
@@ -110,88 +110,80 @@ Create a `.refactorrc.json` file in your project root:
 # Scan a repository for patterns
 refactor scan ./my-repo
 
-# Detect similar patterns across organization
+# Detect similar patterns across the org
 refactor detect --pattern-id abc123
 
-# Apply refactoring (dry-run by default)
+# Apply refactoring (dry-run by default, because we're not reckless)
 refactor apply --pattern-id abc123
 
 # Create coordinated PRs
 refactor propose --pattern-id abc123
 
-# Full workflow
+# Or do the whole dance in one command
 refactor workflow ./my-repo --pattern "function oldApi()"
 ```
 
 #### VS Code Extension
 
-1. Open Command Palette (`Ctrl+Shift+P` / `Cmd+Shift+P`)
+1. Open the Command Palette (`Ctrl+Shift+P` / `Cmd+Shift+P`)
 2. Run `Cross-Repo Refactor: Scan Repository`
-3. Select detected pattern
-4. Review matches across repositories
-5. Click "Create Coordinated PRs"
+3. Pick a detected pattern
+4. Review the matches across your repos
+5. Hit "Create Coordinated PRs" and go make coffee
 
-## How It Works
+## How It Actually Works
 
-### 1. Pattern Detection
-
-The system analyzes your source code and extracts meaningful patterns:
+### 1. It reads your code and picks out patterns
 
 ```typescript
-// Source pattern detected
+// This gets noticed
 function fetchUserData(userId: string) {
   return axios.get(`/api/users/${userId}`);
 }
 ```
 
-### 2. Semantic Matching
+### 2. It finds the cousins, no matter the accent
 
-Using AI embeddings, it finds similar patterns across repositories, even if they're written differently:
+Embeddings match on meaning, so these all light up as the same pattern:
 
 ```python
-# Similar pattern in Python repository
+# Python, different library, same idea
 def get_user_data(user_id: str):
     return requests.get(f"/api/users/{user_id}")
 ```
 
 ```go
-// Similar pattern in Go repository
+// Go, different everything, still matched
 func FetchUserData(userId string) (*User, error) {
     return http.Get("/api/users/" + userId)
 }
 ```
 
-### 3. Coordinated Refactoring
-
-Applies the refactoring strategy to all matched patterns:
+### 3. It applies the change to the whole family
 
 ```typescript
-// Refactored TypeScript
+// TypeScript, now on v2
 function fetchUserData(userId: string) {
   return axios.get(`/api/v2/users/${userId}`);
 }
 ```
 
 ```python
-# Refactored Python
+# Python, also on v2
 def get_user_data(user_id: str):
     return requests.get(f"/api/v2/users/{user_id}")
 ```
 
 ```go
-// Refactored Go
+// Go, you get the idea
 func FetchUserData(userId string) (*User, error) {
     return http.Get("/api/v2/users/" + userId)
 }
 ```
 
-### 4. PR Coordination
+### 4. It opens PRs that reference each other
 
-Creates linked pull requests across all repositories with:
-- Consistent titles and descriptions
-- Cross-references to related PRs
-- Appropriate labels and reviewers
-- Coordinated merge strategy
+Every pull request lands with a consistent title and body, links to its siblings, the right labels, and the reviewers you named. Your team sees one coordinated change instead of eleven mysterious drive-bys.
 
 ## Project Structure
 
@@ -212,7 +204,7 @@ cross-repo-refactor/
 
 ## Technology Stack
 
-- **Language**: TypeScript/Node.js
+- **Language**: TypeScript / Node.js
 - **AI/ML**: Transformers.js, CodeBERT embeddings
 - **Git Operations**: simple-git
 - **Platform APIs**: Octokit (GitHub), GitBeaker (GitLab)
@@ -220,9 +212,9 @@ cross-repo-refactor/
 - **CLI**: Commander.js
 - **VS Code**: Extension API
 
-## Configuration Options
+## Configuration Reference
 
-### Platform Configuration
+### Platform
 
 ```json
 {
@@ -249,7 +241,7 @@ cross-repo-refactor/
 }
 ```
 
-### AI Configuration
+### AI
 
 ```json
 {
@@ -262,7 +254,9 @@ cross-repo-refactor/
 }
 ```
 
-### Refactoring Options
+The `similarityThreshold` is your paranoia dial. Crank it toward 1.0 and it only matches near-identical code. Loosen it and it starts finding distant relatives, some of which you may not want at the reunion.
+
+### Refactoring
 
 ```json
 {
@@ -279,49 +273,55 @@ cross-repo-refactor/
 
 ## Safety Features
 
-### Dry-Run Mode
-Test refactoring without making changes:
+Refactoring across an entire org is the kind of power that should come with a seatbelt. Here are the seatbelts.
+
+### Dry-run mode
+
+Nothing is real until you say so:
+
 ```bash
 refactor apply --dry-run
 ```
 
-### Automatic Backups
-All changes are backed up before application:
+### Automatic backups
+
+Every change is backed up before it touches disk. Regret is reversible:
+
 ```bash
 refactor rollback --refactoring-id abc123
 ```
 
 ### Validation
-Code is validated before and after refactoring:
-- Syntax checking
-- Build verification
-- Test execution (optional)
 
-### Incremental Application
-Apply changes to one repository at a time:
+Code gets checked coming and going: syntax, build, and optionally the test suite.
+
+### One repo at a time
+
+If you'd rather not bet the whole org on a single command:
+
 ```bash
 refactor apply --repo my-org/repo1
 ```
 
 ## Advanced Features
 
-### Custom Pattern Detectors
+### Custom pattern detectors
 
-Create custom pattern detection logic:
+Bring your own idea of what counts as a pattern:
 
 ```typescript
 import { PatternDetector } from '@cross-repo-refactor/core';
 
 class CustomDetector extends PatternDetector {
   async extractPatterns(code: string): Promise<Pattern[]> {
-    // Custom pattern extraction logic
+    // Your pattern extraction logic here
   }
 }
 ```
 
-### Custom Refactoring Strategies
+### Custom refactoring strategies
 
-Define custom refactoring strategies:
+Describe the transformation you want in plain rules:
 
 ```typescript
 import { RefactorStrategy } from '@cross-repo-refactor/core';
@@ -342,9 +342,9 @@ const strategy: RefactorStrategy = {
 };
 ```
 
-### Webhooks and Notifications
+### Webhooks
 
-Configure webhooks for PR events:
+Get pinged when things happen:
 
 ```json
 {
@@ -396,63 +396,60 @@ refactor:
 
 ## Performance
 
-- **Parallel Processing**: Processes multiple repositories concurrently
-- **Intelligent Caching**: Caches embeddings and repository metadata
-- **Incremental Updates**: Only processes changed files
-- **Resource Management**: Configurable memory and disk limits
+Repos are processed in parallel. Embeddings and repo metadata are cached, so the second scan is cheap. Only changed files get reprocessed. Memory and disk limits are yours to set.
 
-## Limitations
+## Honest Limitations
 
-- Requires API access to Git platform
-- Embedding generation can be CPU-intensive
-- Large organizations may require significant cache storage
-- Some complex refactoring patterns may require manual review
+- It needs API access to your Git platform. No access, no magic.
+- Generating embeddings is CPU-hungry. Your laptop fan will have opinions.
+- Big orgs mean big caches. Budget the disk.
+- Some refactors are genuinely gnarly and want a human in the loop. The tool will not pretend otherwise.
 
 ## Roadmap
 
-- [ ] Support for more Git platforms (Azure DevOps, Gitea)
-- [ ] Advanced refactoring strategies (AST-based transformations)
-- [ ] Machine learning for refactoring suggestion
-- [ ] Integration with code review tools
-- [ ] Support for monorepos
-- [ ] Real-time collaboration features
+- [ ] More platforms (Azure DevOps, Gitea)
+- [ ] AST-based transformations for the truly structural refactors
+- [ ] ML-driven refactoring suggestions
+- [ ] Code review tool integrations
+- [ ] Monorepo support
+- [ ] Real-time collaboration
 
 ## Contributing
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for development setup and guidelines.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for setup and guidelines. New contributors welcome, ghost patterns unwelcome.
 
 ## License
 
-MIT License - see [LICENSE](LICENSE) for details.
+MIT License. See [LICENSE](LICENSE).
 
 ## Documentation
 
-- [Getting Started](GETTING_STARTED.md) - Detailed setup guide
-- [Architecture](ARCHITECTURE.md) - System design and architecture
-- [Integration Guide](INTEGRATION_GUIDE.md) - How components work together
-- [API Reference](docs/API.md) - Complete API documentation
-- [Implementation Plan](IMPLEMENTATION_PLAN.md) - Development roadmap
-- [Project Structure](PROJECT_STRUCTURE.md) - Codebase organization
+- [Getting Started](GETTING_STARTED.md)
+- [Architecture](ARCHITECTURE.md)
+- [Integration Guide](INTEGRATION_GUIDE.md)
+- [API Reference](docs/API.md)
+- [Implementation Plan](IMPLEMENTATION_PLAN.md)
+- [Project Structure](PROJECT_STRUCTURE.md)
 
 ## Examples
 
-- [Complete Workflow](examples/complete-workflow/) - End-to-end example
-- [Programmatic API](examples/programmatic-api/) - Using as a library
-- [GitLab CI Integration](examples/gitlab-ci-integration/) - CI/CD pipeline
+- [Complete Workflow](examples/complete-workflow/)
+- [Programmatic API](examples/programmatic-api/)
+- [GitLab CI Integration](examples/gitlab-ci-integration/)
 
 ## Support
 
-- 📖 [Documentation](docs/)
-- 💬 [Discussions](https://github.com/your-org/cross-repo-refactor/discussions)
-- 🐛 [Issue Tracker](https://github.com/your-org/cross-repo-refactor/issues)
-- 📧 Email: support@cross-repo-refactor.dev
+- [Documentation](docs/)
+- [Discussions](https://github.com/your-org/cross-repo-refactor/discussions)
+- [Issue Tracker](https://github.com/your-org/cross-repo-refactor/issues)
+- support@cross-repo-refactor.dev
 
 ## Acknowledgments
 
-- Built with [Transformers.js](https://github.com/xenova/transformers.js)
-- Inspired by the need for cross-repository context in AI-assisted development
-- Thanks to all contributors and early adopters
+- Built on [Transformers.js](https://github.com/xenova/transformers.js)
+- Born from the very specific pain of fixing the same bug in twelve places
+- Thanks to the contributors and early adopters who trusted it near their repos
 
 ---
 
-**Status**: Base implementation complete with 7 packages, comprehensive examples, and full documentation.
+**Status**: Base implementation complete. 7 packages, working examples, full docs.
