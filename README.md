@@ -1,6 +1,6 @@
 # Cross-Repo Refactor Coordinator
 
-> You changed one function in one repo. Somewhere, in eleven other repos, the same function is quietly rotting. This tool knows where.
+AI-powered tool for coordinating refactoring patterns across multiple repositories in an organization
 
 ## The Problem
 
